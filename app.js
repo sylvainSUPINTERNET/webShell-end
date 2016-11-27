@@ -4,58 +4,43 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var path = require('path');
 const exec = require('child_process').exec;
-const session = require('express-session');
+var jwt = require('jsonwebtoken');
+var socketioJwt = require('socketio-jwt');
+var bodyParser = require('body-parser');
 
+var fs = require('fs');
+var https = require('https');
 
-app.use(session({
-    secret: "%dDFy6g#v!ITP3e65oEmneawJ&zuj7iG"
-}));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.set('view engine', 'ejs');
-
-
-//revoir les redirection href.location avec un event Emitter d'une variable sur le if de data
-
-var destinationNotConnected = '/login';
-
-app.use('/',function(req,res,next){
-    io.sockets.on('connection',function(socket){
-        socket.on('connected',function(data){
-            console.log(data);
-            if(data == 'no' || data == null){
-                console.log("Vous n'est actuellement pas coonnecter");
-                socket.emit("nonConnected","/login");
-            }else{
-                console.log("Vous etes connecter");
-            }
-        });
-    });
-    next();
-});
-
 
 app.get('/',function(req,res){
     res.render('index');
 });
 
+app.get('/login', function (req, res) {
+    res.render('login');
+});
+
+// TO DO : mettre en place https
+
+app.post('/login', function (req, res,next) {
+    // TODO: validate the actual user us
+    var profile = {
+        username: 'John',
+        password: 'Doe'
+    };
+    // we are sending the profile in the token
+    var token = jwt.sign(profile, 'secret-user', { expiresIn : 1440 });
+    console.log(token);
+    res.json({token: token});
+});
+
+
+
 
 io.sockets.on('connection',function(socket){
-    socket.on('connected',function(username){
-        console.log(username);
-        var user = username;
-        var allow = false;
-        if(user != 'no'){
-            console.log("User connected :  " + username);
-            allow = true;
-        }
-
-        if(user == "no"){
-            console.log("No user");
-            allow = false;
-        }
-        socket.emit('allowConnection', allow);
-
-    });
 
     socket.emit('message', 'Vous êtes bien connecté !');
 
@@ -65,6 +50,7 @@ io.sockets.on('connection',function(socket){
         exec(data, (error, stdout, stderr) => {
             if (error) {
                 console.error(`exec error: ${error}`);
+                socket.emit('output', `${error}`);
                 return;
             }
             console.log(`stdout: ${stdout}`);
@@ -75,11 +61,20 @@ io.sockets.on('connection',function(socket){
     });
 
 
-    app.get('/login', function (req, res) {
-        res.render('login');
-    });
-
 });
+
+
+//check si le token cote client est bon
+io.sockets
+    .on('connection', socketioJwt.authorize({
+        secret: 'secret-user',
+        timeout: 15000 // 15 seconds to send the authentication message
+    })).on('authenticated', function(socket) {
+    //this socket is authenticated, we are good to handle more events from it.
+    console.log('hello! ' + socket.decoded_token.username);
+});
+
+
 
 
 

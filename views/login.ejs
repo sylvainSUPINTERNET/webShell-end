@@ -1,39 +1,73 @@
-<!doctype html>
-<html lang="fr">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-</head>
-<header>
+    <meta charset="utf-8"/>
+    <title>Web shell.</title>
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-</header>
+</head>
+<style>
+ h1{
+    text-align:center;
+ }
+
+ form {
+     text-align:center;
+ }
+</style>
 <body>
-<h1>Before access to the shell you have to log in</h1>
-<form method="POST" name="formLogin">
-    Username :
-    <input type="text" name="userNname" class="userName">
+<h1>Login</h1>
+
+<form method="POST" name="login" action="/login">
+    <label for="username">Username</label>
     <br>
-    <input type="submit">
+    <input id="username" type="text" name="username">
+    <br>
+    <label for="password">Password</label>
+    <br>
+    <input id="password" type="password" name="password">
+    <br>
+    <br>
+    <input type="submit" value="Log in">
 </form>
+<br>
+<div class="errorLogin"></div>
+
+<br>
+<br>
 <script>
     $(function () {
         var socket = io.connect('http://localhost:3000');
-
-        $('form').submit(function (e) {
-            var usernameEnter = $('.userName').val();
-            sessionStorage.setItem("username", usernameEnter);
-            var username = sessionStorage.getItem("username", username)
-            socket.emit('username', username);
-            if(username !== 'no'){
-            window.location.replace("/");
-            }
+        $('form').submit(function(e){
             e.preventDefault();
+            var username = $('#username').val();
+            var password = $('#password').val();
+
+            $('.errorLogin').css({
+                'text-align':'center'
+            });
+            if(!(username) || !(password)){
+                $('.errorLogin').text("Veuillez bien remplir tous les champs ");
+
+            }else{
+                $.post('/login', {
+                    username: $('username').val(),
+                    password: $('password').val()
+                }).done(function (result) {
+                    localStorage.setItem('token', result.token);
+                    console.log(result.token);
+                });
+
+                window.location.replace("/");
+            }
         });
 
 
+
+
     });
+
 </script>
-<footer></footer>
 </body>
 </html>
