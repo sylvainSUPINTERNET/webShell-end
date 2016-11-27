@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Web shell.</title>
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+</head>
+
+<body>
+<h1>Web Shell</h1>
+<style>
+    html {
+        font-family: 'Press Start 2P', cursive;
+        font-size:12px;
+    }
+
+    input:focus {
+        outline:  none;
+        font-family: 'Press Start 2P', cursive;
+    }
+
+
+</style>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+<br>
+<br>
+<br>
+<p style="background:whitesmoke;box-shadow:0px 1px 1px 1px silver;padding: 5px;width:700px;text-align: center;z-index:6;border-radius:5px; ">Terminal</p>
+<div style="background-color:black;color:lawngreen;overflow: auto;width:700px; height: 200px;padding:5px;border-radius:5px;box-shadow:0px 1px 1px 4px silver;margin-top:-15px;z-index:7; ">
+    <p id="result" style="background-color:black;color:lawngreen">
+    </p>
+    <form method="POST" name="myForm" style="color:lawngreen" autocomplete="off">
+        C:\>
+        <input style="color:lawngreen;background-color:black;border-color:black;width:300px" type="text" name="commandLine" class="commandLine">
+        <br>
+        <input style="visibility: hidden" type="submit" value="execute !">
+    </form>
+</div>
+<script>
+    $(function () {
+        var socket = io.connect('http://localhost:3000');
+
+        var username = sessionStorage.getItem("username", username)
+
+        if(!username){
+        sessionStorage.setItem("username", "no");
+       }
+        socket.emit('connected', username);
+
+        socket.on('nonConnected',function(data){
+            if(data){
+            window.location.replace(data);
+            }
+        });
+
+
+        socket.on('message', function (message) {
+            console.log('Le serveur a un message pour vous : ' + message);
+        });
+
+        $('form').submit(function (e) {
+            var lineToExecute = $('.commandLine').val();
+            console.log(lineToExecute);
+            socket.emit('command', lineToExecute);
+            e.preventDefault();
+        });
+
+        socket.on('output', function (data, stdError) {  //error == stderr
+            console.log("DATA RESULT : " + data);
+            console.log(data);
+            console.log(stdError); //stderr
+            document.getElementById('result').innerText += data;
+        });
+
+    });
+
+</script>
+</body>
+</html>

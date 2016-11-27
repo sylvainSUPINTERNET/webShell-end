@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<header>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+</header>
+<body>
+<h1>Before access to the shell you have to log in</h1>
+<form method="POST" name="formLogin">
+    Username :
+    <input type="text" name="userNname" class="userName">
+    <br>
+    <input type="submit">
+</form>
+<script>
+    $(function () {
+        var socket = io.connect('http://localhost:3000');
+
+        $('form').submit(function (e) {
+            var usernameEnter = $('.userName').val();
+            sessionStorage.setItem("username", usernameEnter);
+            var username = sessionStorage.getItem("username", username)
+            socket.emit('username', username);
+            if(username !== 'no'){
+            window.location.replace("/");
+            }
+            e.preventDefault();
+        });
+
+
+    });
+</script>
+<footer></footer>
+</body>
+</html>
