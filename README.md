@@ -1,5 +1,5 @@
-# webShell-end
-WebShell with web json token and SSL 
+# WebShell
+__Express,socket.io, JWT, SSL, child_process.exec__
 
 #
  **All modules already installed**
@@ -17,7 +17,8 @@ WebShell with web json token and SSL
 # What dosn't works ?
   - SSL connection (can't generate key and certificate)
   
-  
-  
+
+# Instructions 
+https://trello.com/c/Bv4AE8Jm/10-webshell
 
 
