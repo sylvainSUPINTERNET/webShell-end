@@ -1,5 +1,5 @@
 # WebShell
-__Express,socket.io, JWT, SSL, child_process.exec__
+__Express / socket.io / JWT SSL / child_process.exec__
 
 #
  **All modules already installed**
@@ -9,9 +9,9 @@ __Express,socket.io, JWT, SSL, child_process.exec__
     
 # What works ?
   
-  - Convert line from input text to command line
-  - Forbidden access to the shell if you are not authenticated
-  - Login to authenticated with error management and redirect auto to index if connection work
+  - Convert line from input text to command line for shell
+  - Forbidden access to the shell if you are not authenticated (JWT / login system)
+  - Login to authenticated with error management and redirect automaticly to index if the connection dosn't work
   - JWT at the connection with the login (mandatory to use the web shell !)
 
 # What dosn't works ?
